@@ -21,8 +21,7 @@ Opencv
  -  https://www.youtube.com/watch?v=WQeoO7MI0Bs&t=137s 
 
 YOLO + Opencv 
- - https://towardsdatascience.com/object-detection-using-yolov3-and-opencv-
- - 19ee0792a420 
+ - https://towardsdatascience.com/object-detection-using-yolov3-and-opencv-19ee0792a420 
  - https://opencv-tutorial.readthedocs.io/en/latest/yolo/yolo.html#sources 
  - https://learnopencv.com/deep-learning-based-object-detection-using-yolov3-with-opencv-python-c/ 
 
