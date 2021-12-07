@@ -8,7 +8,7 @@ class MainApp:
         """Constructor de la clase MainApp
 
         Args:
-            _path str: la direccion al archivo pedidos.csv
+            __path str: la direccion al archivo pedidos.csv
         """
         # el archivo con los pedidos
         self.route: str = __path
@@ -73,7 +73,7 @@ class MainApp:
         d, m, y = date.split('/')
         return int(y+m+d)
 
-    def ordenado_por_antiguedad(self, ascendiente: bool = True) -> list[dict]:
+    def ordenar_por_antiguedad(self, ascendiente: bool = True) -> list[dict]:
         """Devuelve los pedidos ordenados en orden ascendiente segun la fecha en la que se entrego.
 
         Args:
@@ -85,6 +85,11 @@ class MainApp:
         listado: list[dict] = self.dict_data()
         return sorted(listado, key=lambda x: self.__date_conversor(x['Fecha']), reverse=not ascendiente)
 
+    def ordenado(self) -> None:
+        lista: list[dict] = self.ordenar_por_antiguedad()
+        print(self.titulos)
+        for i, x in enumerate(lista):
+            print(f"{str(i+1).zfill(2)} - {', '.join(list(x.values()))}")
 
     # metodos de abm
     def actualizar_pedidos(self):
@@ -134,17 +139,32 @@ class MainApp:
             else:
                 print("El valor no esta incluido")
 
-    def modificar_pedido(self):  # TODO
+    def modificar(self):  # TODO
         self.ver_pedidos()
-        print("El formato debe ser el siguiente:")
-        self.verificar_formato()
         titulos = self.titulos.split(',')
         try:
-            rta = int(input('Que numero de pedido desea modificar?'))
+            print("Que numero de pedido desea modificar?")
+            rta = int(input())
         except ValueError:
             print('Ingrese un valor numerico.')
         else:
-            pass
+            if 1 <= rta <= len(self.pedidos_totales):
+                titulos = self.titulos.split(',')
+                dict_view: list[dict[any]] = self.dict_data()
+                
+                print("Se pueden modificar los siguientes atributos del pedido:")
+                print(", ".join(x for x in titulos))
+                print("Cual desea cambiar?")
+                atr: str = input("").title()
+                if atr in titulos:
+                    nuevo = input(f"Ingrese el nuevo valor de {atr}: ")
+                    dict_view[rta-1][atr] = nuevo
+                    self.pedidos_totales[rta-1] = ','.join(list(dict_view[rta-1].values()))
+                    self.actualizar_pedidos()
+                else:
+                    print("Ese atributo no existe o esta mal escrito.")
+            else:
+                print("Ese pedido no existe.")
 
     
     # menu
@@ -179,11 +199,11 @@ class MainApp:
                 elif rta == 2:
                     self.borrar()
                 elif rta == 3:
-                    self.modificar_pedido()
+                    self.modificar()
                 elif rta == 4:
                     self.ver_pedidos()
                 elif rta == 5:
-                    print("TODO")
+                    self.ordenado()
                 elif opciones[rta] == 'salir':
                     print('Adios!')
                     return False
