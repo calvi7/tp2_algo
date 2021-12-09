@@ -8,7 +8,7 @@ CAPACIDAD_C3: int = 500
 CAPACIDAD_C4: int = 2000
 
 
-def camiones(peso_caba: int, peso_zn: int, peso_zc: int, peso_zs: int) -> dict[str, str]:
+def camiones(peso_caba: float, peso_zn: float, peso_zc: float, peso_zs: float) -> dict[str, str]:
     contador: int = -1
     camiones_ocupados: list[int] = []
     distribucion_camiones: dict[str, str] = {}
@@ -43,14 +43,15 @@ def calcular_peso(codigo_articulo: str, cantidad: str) -> int:
     return peso
 
 
-def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]) -> None:
+def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]) -> list[float]:
     local_path = path.join(path.dirname(__file__), "src\\pedidos.csv")
     app = MainApp(local_path)
     pedidos = app.dict_data()
-    peso_caba: int = 0
-    peso_zn: int = 0
-    peso_zc: int = 0
-    peso_zs: int = 0
+    peso_caba: float = 0
+    peso_zn: float = 0
+    peso_zc: float = 0
+    peso_zs: float = 0
+    lista_pesos: list[float] = []
 
     for pedido in pedidos:
         if pedido["Ciudad"] == "CABA":
@@ -63,4 +64,30 @@ def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]
             peso_zc += calcular_peso(pedido["Cod. Articulo"], pedido["Cantidad"])
         elif pedido["Ciudad"] in lista_zs:
             peso_zs += calcular_peso(pedido["Cod. Articulo"], pedido["Cantidad"])
+    peso_caba = peso_caba / 1000
+    peso_zn = peso_zn / 1000
+    peso_zc = peso_zc / 1000
+    peso_zs = peso_zs / 1000
+    lista_pesos = [peso_caba, peso_zn, peso_zc, peso_zs]
+    return lista_pesos
 
+
+def escritura_archivo(distribucion: dict[str, str], pesos: list[float]) -> None:
+    utilitario_caba: str = distribucion["caba"]
+    utilitario_norte: str = distribucion["norte"]
+    utilitario_centro: str = distribucion["centro"]
+    utilitario_sur: str = distribucion["sur"]
+    with open("salida.txt", "w") as salida:
+        salida.writelines(f"CABA:\n{utilitario_caba}\n{pesos[0]} Kg\n Recorrido\n\n"
+                          f"Zona norte:\n{utilitario_norte}\n{pesos[1]} Kg\n Recorrido\n\n"
+                          f"Zona centro:\n{utilitario_centro}\n{pesos[2]} Kg\n Recorrido\n\n"
+                          f"Zona sur:\n{utilitario_sur}\n{pesos[3]} Kg\n Recorrido")
+
+
+def main() -> None:
+    pesos = pesos_por_zona(["Parana"], ["Villa María"], ["Santa Rosa"])
+    distribucion_camiones = camiones(pesos[0], pesos[1], pesos[2], pesos[3])
+    escritura_archivo(distribucion_camiones, pesos)
+
+
+main()
