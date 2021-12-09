@@ -6,9 +6,16 @@ CAPACIDAD_C1: int = 600
 CAPACIDAD_C2: int = 1000
 CAPACIDAD_C3: int = 500
 CAPACIDAD_C4: int = 2000
+CODIGO_BOTELLAS: str = "1334"
+CODIGO_VASOS: str = "564"
+PESO_BOTELLAS: int = 450
+PESO_VASOS: int = 350
 
 
 def camiones(peso_caba: float, peso_zn: float, peso_zc: float, peso_zs: float) -> dict[str, str]:
+    """Le paso el peso total que se tiene que entregar a cada zona y los distribuye en los distintos camiones,
+    intenta darle el camion mas chico que satisface el peso necesario. Me devuelve un diccionario con llave
+    la zona y valor que utilitario fue designado a esa zona"""
     contador: int = -1
     camiones_ocupados: list[int] = []
     distribucion_camiones: dict[str, str] = {}
@@ -30,20 +37,23 @@ def camiones(peso_caba: float, peso_zn: float, peso_zc: float, peso_zs: float) -
             camiones_ocupados.append(CAPACIDAD_C4)
         else:
             print(":(")
-        return distribucion_camiones
+    return distribucion_camiones
 
 
 def calcular_peso(codigo_articulo: str, cantidad: str) -> int:
+    """Le paso el codigo de articulo y la cantidad de un pedido para que me devuelva el peso de ese pedido"""
     peso: int = 0
 
-    if codigo_articulo == "1334":
-        peso = int(cantidad) * 450
-    elif codigo_articulo == "568":
-        peso = int(cantidad) * 350
+    if codigo_articulo == CODIGO_BOTELLAS:
+        peso = int(cantidad) * PESO_BOTELLAS
+    elif codigo_articulo == CODIGO_VASOS:
+        peso = int(cantidad) * PESO_VASOS
     return peso
 
 
 def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]) -> list[float]:
+    """Le paso 3 listas una por cada zona con las respectivas ciudades de cada una, me calcula el peso
+    total de productos que se necesitan entregar en cada zona y me los devuelve en una lista"""
     local_path = path.join(path.dirname(__file__), "src\\pedidos.csv")
     app = MainApp(local_path)
     pedidos = app.dict_data()
@@ -51,7 +61,7 @@ def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]
     peso_zn: float = 0
     peso_zc: float = 0
     peso_zs: float = 0
-    lista_pesos: list[float] = []
+    lista_pesos: list[float]
 
     for pedido in pedidos:
         if pedido["Ciudad"] == "CABA":
@@ -73,6 +83,9 @@ def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]
 
 
 def escritura_archivo(distribucion: dict[str, str], pesos: list[float]) -> None:
+    """Le paso un diccionario diciendole a que zona va que camion y una lista con los pesos de
+    las distintas zona, con eso me escribe un archivo salida.txt donde se puede encontrar la informacion que
+    se le paso"""
     utilitario_caba: str = distribucion["caba"]
     utilitario_norte: str = distribucion["norte"]
     utilitario_centro: str = distribucion["centro"]
