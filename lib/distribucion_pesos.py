@@ -2,6 +2,7 @@ from abm import MainApp
 from os import path
 
 
+CAMINO_PARA_EL_CSV: str = "src\\pedidos.csv"
 CAPACIDAD_C1: int = 600
 CAPACIDAD_C2: int = 1000
 CAPACIDAD_C3: int = 500
@@ -54,7 +55,7 @@ def calcular_peso(codigo_articulo: str, cantidad: str) -> int:
 def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]) -> list[float]:
     """Le paso 3 listas una por cada zona con las respectivas ciudades de cada una, me calcula el peso
     total de productos que se necesitan entregar en cada zona y me los devuelve en una lista"""
-    local_path = path.join(path.dirname(__file__), "src\\pedidos.csv")
+    local_path = path.join(path.dirname(__file__), CAMINO_PARA_EL_CSV)
     app = MainApp(local_path)
     pedidos = app.dict_data()
     peso_caba: float = 0
@@ -74,6 +75,8 @@ def pesos_por_zona(lista_zn: list[str], lista_zc: list[str], lista_zs: list[str]
             peso_zc += calcular_peso(pedido["Cod. Articulo"], pedido["Cantidad"])
         elif pedido["Ciudad"] in lista_zs:
             peso_zs += calcular_peso(pedido["Cod. Articulo"], pedido["Cantidad"])
+
+    # Paso de gramos a kilogramos
     peso_caba = peso_caba / 1000
     peso_zn = peso_zn / 1000
     peso_zc = peso_zc / 1000
