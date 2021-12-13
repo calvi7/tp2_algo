@@ -11,15 +11,15 @@ class Pedidos:
     sean ingresados correctamente.
     """
     listado: list[str] = []
-    
+
     def __init__(self, listado: list[str]) -> None:
         listado: list[str] = [x.split(",") for x in listado]
-        
+
         for i, p in enumerate(listado):
-            
+
             fecha, codigo = p[1], p[5]
             cantidad, descuento = p[7], p[8]
-            
+
             self.listado.append(",".join(p))
             if not self.__validar_fecha(fecha):
                 print(f"El pedido {i+1} tiene errores de formato en la fecha.")
@@ -28,7 +28,7 @@ class Pedidos:
             if not self.__validar_numerico(cantidad, descuento):
                 print(f"El pedido {i+1} tiene valores no numericos ingresados donde deberian"
                       " ser numericos.")
-            
+
     def __validar_fecha(self, fecha: str) -> bool:
         """Valida que la fecha ingresada sea valida para evitar errores en comparaciones y otras funciones.
 
@@ -45,7 +45,7 @@ class Pedidos:
         else:
             d, m, y = fecha.split("/")
             return len(d) == 2 and len(m) == 2 and len(y) == 4
-    
+
     def __validar_numerico(self, *args) -> bool:
         """Valida que los valores ingresados sean numericos.
         """
@@ -54,9 +54,9 @@ class Pedidos:
                 int(arg)
             except ValueError:
                 return False
-            
+
         return True
-    
+
     def __validar_codigo(self, codigo: str) -> bool:
         """Prueba si el codigo sea un int y sea igual a 1334 o 568
 
@@ -71,17 +71,10 @@ class Pedidos:
 
 class Titulos(str):
     """Los titulos del csv. Verifica que tenga el largo adecuado.
-    """ 
-    def __init__(self, titulos: str) -> None:
-        TOTAL_TITULOS: int = 9
-        titulos: str = titulos.replace(', ', ',')
-        if len(titulos.split(',')) == TOTAL_TITULOS:
-            self.titulos = titulos
-        else:
-            print("La cantidad de titulos no es la adecuada.")    
+    """
 
-    def __str__(self):
-        return ', '.join((self.titulos).split(','))
+    def __init__(self, titulos: str) -> None:
+        self.titulos: str = titulos.replace(', ', ',')
 
 
 class Controlador:
@@ -96,6 +89,7 @@ class Controlador:
 
         self.titulos = Titulos(self.raw_pedidos[0])
         self.pedidos = Pedidos(self.raw_pedidos[1:])
+        self.__actualizar()
 
     def ver_pedidos(self) -> None:
         print(self.titulos.titulos)
@@ -108,9 +102,9 @@ class Controlador:
         Returns:
             list[dict[any]]: 
         """
-        
+
         lista = []
-        
+
         with open(self.route, 'r') as csvfile:
             reader = DictReader(csvfile)
             for row in reader:
@@ -126,7 +120,7 @@ class Controlador:
             f.writelines(self.titulos.titulos + '\n')
             for line in self.pedidos.listado:
                 f.writelines(line + '\n')
-    
+
     def cargar(self, pedido: str) -> None:
         """Sirve para cargar pedidos al archivo pedidos.csv agregandolos al final del mismo.  
 
@@ -136,7 +130,7 @@ class Controlador:
         """
         self.pedidos.listado.append(pedido)
         self.__actualizar()
-                                        
+
     def borrar(self, index: int) -> None:
         """Borra el pedido pasado como parametro del listado
 
@@ -145,7 +139,7 @@ class Controlador:
         """
         self.pedidos.listado.pop(index)
         self.__actualizar()
-        
+
     def modificar(self, index: int, key: str, valor: str) -> None:
         """Modifica un atributo dado de un pedido dado.
 
@@ -156,7 +150,7 @@ class Controlador:
         """
         valores_dict = self.dict_data()
         valores_dict[index][key] = valor
-        
+
         self.pedidos.listado[index] = ','.join(valores_dict[index].values())
         self.__actualizar()
 
@@ -197,22 +191,22 @@ class User:
 
         # titulos
         self.titulos = self.ctrl.titulos.titulos
-        
+
     def cargar(self) -> None:
         """Cargar un pedido al archivo .csv
         """
         print("A continuacion se le pedira que ingrese los siguientes valores: ")
         print(self.titulos)
-        
+
         req: dict[any] = {}
         titulos = self.titulos.split(',')
-        
+
         for titulo in titulos:
             add = ""
             if titulo == 'Fecha':
                 add = ' (dd/mm/yyyy)'
             req[titulo] = input(f"{titulo}{add}: ")
-        
+
         self.ctrl.cargar(','.join(list(req.values())))
 
     def borrar(self) -> None:
@@ -230,7 +224,7 @@ class User:
                 print(f"Se borró el pedido {rta}!")
             else:
                 print("El valor no esta incluido")
-                
+
     def modificar(self):  # TODO
         self.ctrl.ver_pedidos()
         titulos = self.titulos.split(',')
@@ -253,7 +247,7 @@ class User:
                     print("Ese atributo no existe o esta mal escrito.")
             else:
                 print("Ese pedido no existe.")
-    
+
     def ordenado(self) -> None:
         """Imprime la lista ordenada por antiguedad
         """
@@ -270,4 +264,6 @@ class User:
 class MainApp(User):
     def __init__(self, route) -> None:
         super().__init__(route)
-    
+
+
+myApp = User(ROUTE)

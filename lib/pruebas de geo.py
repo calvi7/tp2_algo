@@ -65,12 +65,18 @@ def main():
     list_zona_sur = []
 
     datos = myApp.dict_data()
-    provincias = []
-    ciudades = []
+
+    # casteo los datos a set para que sean unicos.
+    provincias = set()
+    ciudades = set()
 
     for pedido in datos:
-        provincias.append(pedido['Provincia'])
-        ciudades.append(pedido['Ciudad'])
+        provincias.add(pedido['Provincia'])
+        ciudades.add(pedido['Ciudad'])
+
+    # los vuelvo a castear a lista para que sea mas facil trabajar
+    provincias = list(provincias)
+    ciudades = list(ciudades)
 
     print(provincias)
 
