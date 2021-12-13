@@ -264,6 +264,3 @@ class User:
 class MainApp(User):
     def __init__(self, route) -> None:
         super().__init__(route)
-
-
-myApp = User(ROUTE)
