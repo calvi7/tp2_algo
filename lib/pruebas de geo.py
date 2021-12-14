@@ -77,6 +77,8 @@ def main():
     # los vuelvo a castear a lista para que sea mas facil trabajar
     provincias = list(provincias)
     ciudades = list(ciudades)
+    
+    ciudades.remove("CABA")
 
     print(provincias)
 
