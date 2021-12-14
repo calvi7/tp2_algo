@@ -1,4 +1,4 @@
-import pruebas_geo
+# import pruebas_geo
 
 from abm import MainApp
 from os import path
@@ -12,7 +12,12 @@ ROUTE = path.join(path.dirname(__file__), CSV_ROUTE)
 APP = MainApp(ROUTE)
 
 
-def generar_menu() -> int:
+def generar_menu() -> tuple:
+    """Genera el menu con sus opciones
+
+    Returns:
+        tuple: devuelve la opcion elegida junto con el valor correspondiente a la opcion de salir
+    """
     # declaro las opciones del menu
     menu = {
         1: "cargar pedido",
@@ -35,10 +40,30 @@ def generar_menu() -> int:
         print("Ingrese un valor numerico.")
     else:
         if rta in menu.keys():
-            return rta
+            return rta, list(menu.keys())[-1]
         else:
             print("Esa opcion no existe.")
-            return generar_menu()
+            return generar_menu(), list(menu.keys())[-1]
 
 
-generar_menu()
+def main():
+    # inicializo variable para el loop
+    val = True
+
+    # loop
+    while val:
+        opc, salir = generar_menu()
+
+        if opc == salir:
+            print("Adios!")
+            val = False
+
+        if opc == 1:
+            APP.cargar()
+        if opc == 2:
+            APP.borrar()
+        if opc == 3:
+            APP.modificar()
+
+
+main()
