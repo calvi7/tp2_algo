@@ -2,7 +2,7 @@ from abm import MainApp
 from os import path
 
 
-CAMINO_PARA_EL_CSV: str = "src\\pedidos.csv"
+CAMINO_PARA_EL_CSV: str = "src/pedidos.csv"
 CAPACIDAD_C1: int = 600
 CAPACIDAD_C2: int = 1000
 CAPACIDAD_C3: int = 500
@@ -11,6 +11,21 @@ CODIGO_BOTELLAS: str = "1334"
 CODIGO_VASOS: str = "568"
 PESO_BOTELLAS: int = 450
 PESO_VASOS: int = 350
+
+
+def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[str: str]]):
+    """Le paso las listas con todos los pedidos y la lista con los pedidos que no se pudieron completar, las comparo
+    para definir los pedidos que si se pudieron completar y los imprimo por pantalla"""
+    pedidos_completados: list[dict[str: str]] = []
+    contador: int = 0
+
+    for pedido in pedidos:
+        if pedido not in pedidos_no_completados:
+            pedidos_completados.append(pedido)
+    for pedido in pedidos_completados:
+        contador += 1
+        print(pedido)
+    print(f"Se pudieron completar {contador} pedidos")
 
 
 def escritura_archivo(distribucion: dict[str, str]) -> None:
@@ -99,7 +114,6 @@ def pesos_por_zona(pedidos: list[list[dict]]) -> list[float]:
     peso_zc: float = 0
     peso_zs: float = 0
     lista_pesos: list[float]
-    contador: int = -1
 
     for pedido in pedidos[0]:
         peso_caba += calcular_peso(pedido["Cod. Articulo"], pedido["Cantidad"])
@@ -148,6 +162,7 @@ def main() -> None:
     pesos: list[float] = pesos_por_zona(pedidos_por_zona)
     distribucion_camiones = camiones(pesos[0], pesos[1], pesos[2], pesos[3], pedidos_por_zona, pedidos_no_completados)
     escritura_archivo(distribucion_camiones)
+    completados(pedidos, pedidos_no_completados)
 
 
 main()
