@@ -5,12 +5,12 @@ import csv
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
-from abm import MainApp
+# from abm import MainApp
 from os import path
 
 ROUTE = path.join(path.dirname(__file__), "src\\pedidos.csv")
 
-myApp = MainApp(ROUTE)
+# myApp = MainApp(ROUTE)
 
 
 def mas_cerca_de_Caba(lista_1):
@@ -57,7 +57,7 @@ def recorrdio_zonas_centro_sur(list_1):
     return recorrido
 
 
-def run():
+def run(pedidos):
     geo = Nominatim(user_agent="Tp 2")
 
     dict_zona_norte = {}
@@ -66,7 +66,8 @@ def run():
     list_zona_centro = []
     list_zona_sur = []
 
-    datos = myApp.dict_data()
+    #datos = myApp.dict_data()
+    datos = pedidos
 
     # casteo los datos a set para que sean unicos.
     provincias = set()

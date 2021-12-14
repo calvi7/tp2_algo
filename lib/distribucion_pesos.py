@@ -1,8 +1,9 @@
 from abm import MainApp
 from os import path
+from pruebas_geo import run
 
 
-CAMINO_PARA_EL_CSV: str = "src/pedidos.csv"
+CAMINO_PARA_EL_CSV: str = "src\\pedidos.csv"
 CAPACIDAD_C1: int = 600
 CAPACIDAD_C2: int = 1000
 CAPACIDAD_C3: int = 500
@@ -13,7 +14,7 @@ PESO_BOTELLAS: int = 450
 PESO_VASOS: int = 350
 
 
-def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[str: str]]):
+def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[str: str]]) -> None:
     """Le paso las listas con todos los pedidos y la lista con los pedidos que no se pudieron completar, las comparo
     para definir los pedidos que si se pudieron completar y los imprimo por pantalla"""
     pedidos_completados: list[dict[str: str]] = []
@@ -28,20 +29,27 @@ def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[
     print(f"Se pudieron completar {contador} pedidos")
 
 
-def escritura_archivo(distribucion: dict[str, str]) -> None:
+def escritura_archivo(distribucion: dict[str, str], recorrido: tuple) -> None:
     """Le paso un diccionario diciendole a que zona va que camion y cuanto peso hay por zona,
      con eso me escribe un archivo salida.txt donde se puede encontrar la informacion que se le paso"""
     utilitario_caba: str = distribucion["caba"]
     utilitario_norte: str = distribucion["norte"]
     utilitario_centro: str = distribucion["centro"]
     utilitario_sur: str = distribucion["sur"]
+    # recorrido_norte = run()[0]
+    # recorrido_centro = run()[1]
+    # recorrido_sur = run()[2]
+
+    recorrido_norte = recorrido[0]
+    recorrido_centro = recorrido[1]
+    recorrido_sur = recorrido[2]
     pesos: list = [distribucion["peso caba"], distribucion["peso norte"], distribucion["peso centro"],
                    distribucion["peso sur"]]
     with open("salida.txt", "w") as salida:
-        salida.writelines(f"CABA:\n{utilitario_caba}\n{pesos[0]} Kg\n Recorrido\n\n"
-                          f"Zona norte:\n{utilitario_norte}\n{pesos[1]} Kg\n Recorrido\n\n"
-                          f"Zona centro:\n{utilitario_centro}\n{pesos[2]} Kg\n Recorrido\n\n"
-                          f"Zona sur:\n{utilitario_sur}\n{pesos[3]} Kg\n Recorrido")
+        salida.writelines(f"CABA:\n{utilitario_caba}\n{pesos[0]} Kg\nCABA\n\n"
+                          f"Zona norte:\n{utilitario_norte}\n{pesos[1]} Kg\n{recorrido_norte}\n\n"
+                          f"Zona centro:\n{utilitario_centro}\n{pesos[2]} Kg\n{recorrido_centro}\n\n"
+                          f"Zona sur:\n{utilitario_sur}\n{pesos[3]} Kg\n{recorrido_sur}")
 
 
 def calcular_peso(codigo_articulo: str, cantidad: str) -> int:
@@ -157,11 +165,12 @@ def main() -> None:
     app = MainApp(local_path)
     pedidos = app.dict_data()
     pedidos_no_completados: list[dict[str, str]] = []
+    recorridos = run(pedidos)
 
-    pedidos_por_zona: list[list[dict]] = zona_de_pedidos(pedidos, ["Parana"], ["Villa María"], ["Santa Rosa"])
+    pedidos_por_zona: list[list[dict]] = zona_de_pedidos(pedidos, recorridos[0], recorridos[1], recorridos[2])
     pesos: list[float] = pesos_por_zona(pedidos_por_zona)
     distribucion_camiones = camiones(pesos[0], pesos[1], pesos[2], pesos[3], pedidos_por_zona, pedidos_no_completados)
-    escritura_archivo(distribucion_camiones)
+    escritura_archivo(distribucion_camiones, recorridos)
     completados(pedidos, pedidos_no_completados)
 
 
