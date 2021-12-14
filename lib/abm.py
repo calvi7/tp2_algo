@@ -10,17 +10,17 @@ class Pedidos:
     """El listado de pedidos del archivo csv. Valida que los valores
     sean ingresados correctamente.
     """
-    listado: list[str] = []
+    lista: list[str] = []
 
-    def __init__(self, listado: list[str]) -> None:
-        listado: list[str] = [x.split(",") for x in listado]
+    def __init__(self, pedidos: list[str]) -> None:
+        lista: list[str] = [x.split(",") for x in pedidos]
 
-        for i, p in enumerate(listado):
+        for i, p in enumerate(lista):
 
             fecha, codigo = p[1], p[5]
             cantidad, descuento = p[7], p[8]
 
-            self.listado.append(",".join(p))
+            self.lista.append(",".join(p))
             if not self.__validar_fecha(fecha):
                 print(f"El pedido {i+1} tiene errores de formato en la fecha.")
             if not self.__validar_codigo(codigo):
@@ -73,8 +73,8 @@ class Titulos(str):
     """Los titulos del csv. Verifica que tenga el largo adecuado.
     """
 
-    def __init__(self, titulos: str) -> None:
-        self.titulos: str = titulos.replace(', ', ',')
+    def __init__(self, entrada: str) -> None:
+        self.titulos: str = entrada.replace(', ', ',')
 
 
 class Controlador:
@@ -87,13 +87,17 @@ class Controlador:
         with open(self.route, 'r') as f:
             self.raw_pedidos: list[str] = f.read().splitlines()
 
-        self.titulos = Titulos(self.raw_pedidos[0])
-        self.pedidos = Pedidos(self.raw_pedidos[1:])
+        tmp_titulos = Titulos(self.raw_pedidos[0])
+        tmp_pedidos = Pedidos(self.raw_pedidos[1:])
+
+        self.titulos = tmp_titulos.titulos
+        self.pedidos = tmp_pedidos.lista
+
         self.__actualizar()
 
     def ver_pedidos(self) -> None:
-        print(self.titulos.titulos)
-        for i, pedido in enumerate(self.pedidos.listado):
+        print(self.titulos)
+        for i, pedido in enumerate(self.pedidos):
             print(f'{str(i+1).zfill(3)} - {pedido}')
 
     def dict_data(self) -> list[dict[any]]:
@@ -116,10 +120,16 @@ class Controlador:
     def __actualizar(self) -> None:
         """Actualiza el archivo csv
         """
+
+        # fix curita que puede traer otros problemas
+        self.pedidos = list(set(self.pedidos))
+
         with open(self.route, 'w') as f:
-            f.writelines(self.titulos.titulos + '\n')
-            for line in self.pedidos.listado:
+            f.writelines(self.titulos + '\n')
+            for line in self.pedidos:
                 f.writelines(line + '\n')
+
+        print(len(self.pedidos))
 
     def cargar(self, pedido: str) -> None:
         """Sirve para cargar pedidos al archivo pedidos.csv agregandolos al final del mismo.  
@@ -128,16 +138,16 @@ class Controlador:
             linea (str): el pedido a cargar. El formato deberia ser de acuerdo a la primera linea del archivo .csv
             propuesto en el metodo verificar_formato().
         """
-        self.pedidos.listado.append(pedido)
+        self.pedidos.append(pedido)
         self.__actualizar()
 
     def borrar(self, index: int) -> None:
-        """Borra el pedido pasado como parametro del listado
+        """Borra el pedido pasado como parametro del lista
 
         Args:
             index (int): indice del pedido que se quiere borrar
         """
-        self.pedidos.listado.pop(index)
+        self.pedidos.pop(index)
         self.__actualizar()
 
     def modificar(self, index: int, key: str, valor: str) -> None:
@@ -151,7 +161,7 @@ class Controlador:
         valores_dict = self.dict_data()
         valores_dict[index][key] = valor
 
-        self.pedidos.listado[index] = ','.join(valores_dict[index].values())
+        self.pedidos.lista[index] = ','.join(valores_dict[index].values())
         self.__actualizar()
 
     def __date_conversor(self, date: str) -> int:
@@ -175,8 +185,8 @@ class Controlador:
         Returns:
             list[dict]: Los pedidos ordenados segun su fecha
         """
-        listado: list[dict] = self.dict_data()
-        return sorted(listado, key=lambda x: self.__date_conversor(x['Fecha']), reverse=not ascendiente)
+        lista: list[dict] = self.dict_data()
+        return sorted(lista, key=lambda x: self.__date_conversor(x['Fecha']), reverse=not ascendiente)
 
 
 class User:
@@ -190,7 +200,7 @@ class User:
         self.ctrl: Controlador = Controlador(route)
 
         # titulos
-        self.titulos = self.ctrl.titulos.titulos
+        self.titulos = self.ctrl.titulos
 
     def cargar(self) -> None:
         """Cargar un pedido al archivo .csv
@@ -219,7 +229,7 @@ class User:
         except ValueError:
             print("Ingrese un valor numerico.")
         else:
-            if 1 <= rta <= len(self.ctrl.pedidos.listado)+1:
+            if 1 <= rta <= len(self.ctrl.pedidos.lista)+1:
                 self.ctrl.borrar(rta-1)
                 print(f"Se borró el pedido {rta}!")
             else:
@@ -234,7 +244,7 @@ class User:
         except ValueError:
             print('Ingrese un valor numerico.')
         else:
-            if 1 <= rta <= len(self.ctrl.pedidos.listado):
+            if 1 <= rta <= len(self.ctrl.pedidos.lista):
 
                 print("Se pueden modificar los siguientes atributos del pedido:")
                 print(", ".join(x for x in titulos))
