@@ -1,4 +1,6 @@
 # antes era pruebas de geo.py, cambie el nombre para importarlo facil
+# el archivo fue escrito por la estudiante anto ranelli, git lo acredita
+# a marcos calvi por el cambio de nombre en el archivo.
 
 import csv
 
