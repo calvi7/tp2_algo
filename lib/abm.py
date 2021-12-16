@@ -158,7 +158,7 @@ class Controlador:
             key (str): El atributo que se quiere cambiar del pedido.
             valor (str): El nuevo valor que se le va a asignar al atributo.
         """
-        valores_dict = self.dict_data()
+        valores_dict = self.dict_data().copy()
         valores_dict[index][key] = valor
 
         self.pedidos.lista[index] = ','.join(valores_dict[index].values())
@@ -185,8 +185,45 @@ class Controlador:
         Returns:
             list[dict]: Los pedidos ordenados segun su fecha
         """
-        lista: list[dict] = self.dict_data()
+        lista: list[dict] = self.dict_data().copy()
         return sorted(lista, key=lambda x: self.__date_conversor(x['Fecha']), reverse=not ascendiente)
+
+    def articulo_mas_pedido(self) -> tuple[int, str]:
+        """Devuelve el articulo mas pedido, junto con su color y la cantidad
+
+        Returns:
+            tuple[tuple[str, int], str]: ((color, cantidad), codigo)
+        """
+        listado = self.dict_data().copy()
+
+        botellas, vasos = {}, {}
+
+        for elemento in listado:
+            try:
+                # botellas
+                if elemento["Cod. Articulo"] == '1334':
+                    if elemento["Color"] not in botellas.keys():
+                        botellas[elemento["Color"]] = int(elemento["Cantidad"])
+                    else:
+                        botellas[elemento["Color"]
+                                 ] += int(elemento["Cantidad"])
+
+                # vasos
+                elif elemento["Cod. Articulo"] == '568':
+                    if elemento["Color"] not in vasos.keys():
+                        vasos[elemento["Color"]] = int(elemento["Cantidad"])
+                    else:
+                        vasos[elemento["Color"]] += int(elemento["Cantidad"])
+            except ValueError:
+                print("Hay un valor no-numerico ingresado en las cantidades.")
+
+        # dos tuplas[max, codigo]
+        max_botellas = max(botellas.items(), key=lambda x: x[1]), "1334"
+        max_vasos = max(vasos.items(), key=lambda x: x[1]), "568"
+
+        maximo_total = max([max_vasos, max_botellas], key=lambda x: x[0][1])
+
+        return maximo_total
 
 
 class User:
@@ -269,6 +306,17 @@ class User:
 
     def dict_data(self) -> list[dict[any]]:
         return self.ctrl.dict_data()
+
+    def maximo_pedido(self):
+        maximo, codigo = self.ctrl.articulo_mas_pedido()
+
+        print(f"El articulo mas pedido fue:")
+        if codigo == "1334":
+            print("Botella")
+        else:
+            print("Vaso")
+        print(maximo[0])
+        print(f"con {maximo[1]} pedidos.")
 
 
 class MainApp(User):

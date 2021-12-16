@@ -1,6 +1,6 @@
 from abm import MainApp
 from os import path
-from pruebas_geo import run
+import pruebas_geo as pg
 
 
 CAMINO_PARA_EL_CSV: str = "src\\pedidos.csv"
@@ -25,7 +25,6 @@ def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[
             pedidos_completados.append(pedido)
     for pedido in pedidos_completados:
         contador += 1
-        print(pedido)
     print(f"Se pudieron completar {contador} pedidos")
 
 
@@ -160,18 +159,20 @@ def zona_de_pedidos(pedidos: list[dict[str, str]], lista_zn: list, lista_zc: lis
     return [pedidos_caba, pedidos_zn, pedidos_zc, pedidos_zs]
 
 
-def main() -> None:
+def run() -> None:
     local_path = path.join(path.dirname(__file__), CAMINO_PARA_EL_CSV)
     app = MainApp(local_path)
     pedidos = app.dict_data()
     pedidos_no_completados: list[dict[str, str]] = []
-    recorridos = run(pedidos)
+    recorridos = pg.run(pedidos)
 
-    pedidos_por_zona: list[list[dict]] = zona_de_pedidos(pedidos, recorridos[0], recorridos[1], recorridos[2])
+    pedidos_por_zona: list[list[dict]] = zona_de_pedidos(
+        pedidos, recorridos[0], recorridos[1], recorridos[2])
     pesos: list[float] = pesos_por_zona(pedidos_por_zona)
-    distribucion_camiones = camiones(pesos[0], pesos[1], pesos[2], pesos[3], pedidos_por_zona, pedidos_no_completados)
+    distribucion_camiones = camiones(
+        pesos[0], pesos[1], pesos[2], pesos[3], pedidos_por_zona, pedidos_no_completados)
     escritura_archivo(distribucion_camiones, recorridos)
     completados(pedidos, pedidos_no_completados)
 
 
-main()
+# main()
