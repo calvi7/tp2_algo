@@ -13,7 +13,7 @@ ROUTE = path.join(path.dirname(__file__), "src\\pedidos.csv")
 # myApp = MainApp(ROUTE)
 
 
-def mas_cerca_de_Caba(lista_1):
+def mas_cerca_de_Caba(lista_1: list) -> tuple[any]:
     geo: Nominatim = Nominatim(user_agent="Tp 2")
     lista: list = lista_1
     distancia_x_provincia: dict = {}
@@ -73,9 +73,13 @@ def run(pedidos):
     provincias = set()
     ciudades = set()
 
+    # formas en las que puede aparecer CABA
+    nombres_caba = ['CABA', 'caba']
+
     for pedido in datos:
-        provincias.add(pedido['Provincia'])
-        ciudades.add(pedido['Ciudad'])
+        if not pedido['Ciudad'] in nombres_caba:
+            provincias.add(pedido['Provincia'])
+            ciudades.add(pedido['Ciudad'])
 
     # los vuelvo a castear a lista para que sea mas facil trabajar
     provincias = list(provincias)
