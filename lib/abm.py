@@ -129,8 +129,6 @@ class Controlador:
             for line in self.pedidos:
                 f.writelines(line + '\n')
 
-        print(len(self.pedidos))
-
     def cargar(self, pedido: str) -> None:
         """Sirve para cargar pedidos al archivo pedidos.csv agregandolos al final del mismo.  
 

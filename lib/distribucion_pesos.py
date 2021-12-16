@@ -14,7 +14,7 @@ PESO_BOTELLAS: int = 450
 PESO_VASOS: int = 350
 
 
-def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[str: str]]) -> None:
+def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[str: str]]) -> list[dict]:
     """Le paso las listas con todos los pedidos y la lista con los pedidos que no se pudieron completar, las comparo
     para definir los pedidos que si se pudieron completar y los imprimo por pantalla"""
     pedidos_completados: list[dict[str: str]] = []
@@ -26,6 +26,7 @@ def completados(pedidos: list[dict[str:str]], pedidos_no_completados: list[dict[
     for pedido in pedidos_completados:
         contador += 1
     print(f"Se pudieron completar {contador} pedidos")
+    return pedidos_completados
 
 
 def escritura_archivo(distribucion: dict[str, str], recorrido: tuple) -> None:
@@ -172,7 +173,9 @@ def run() -> None:
     distribucion_camiones = camiones(
         pesos[0], pesos[1], pesos[2], pesos[3], pedidos_por_zona, pedidos_no_completados)
     escritura_archivo(distribucion_camiones, recorridos)
-    completados(pedidos, pedidos_no_completados)
+    p_completados = completados(pedidos, pedidos_no_completados)
+    return p_completados
 
 
-# main()
+if __name__ == "__main__":
+    run()

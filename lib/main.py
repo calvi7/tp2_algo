@@ -1,15 +1,65 @@
-# import pruebas_geo
+from os import path
+from sys import platform
+
+import distribucion_pesos as dp
 
 from abm import MainApp
-from os import path
+
+# Para que distintos sistemas operativos puedan operar
+# sin cambiar el archivo
 
 
-# la ruta al csv. Funciona para sistemas operativos Windows
-CSV_ROUTE = 'src\\pedidos.csv'
+def slash_gen() -> str:
+    """Genera la barra del medio para los path"""
+    if platform == "linux" or platform == "linux2":
+        return "/"
+    elif platform == "darwin":
+        return "/"
+    elif platform == "win32":
+        return "\\"
+
+
+# ruta al csv
+SLASH = slash_gen()
+CSV_ROUTE = f'src{SLASH}pedidos.csv'
 ROUTE = path.join(path.dirname(__file__), CSV_ROUTE)
 
 # inicializo la MainApp
 APP = MainApp(ROUTE)
+
+
+def date_conversor(date: str) -> int:
+    """Convierte una fecha de tipo dd/mm/yyyy a yyyymmdd para comparar mas facilmente
+
+    Args:
+        date (str): la fecha que se quiere cambiar. Formato dd/mm/yyyy
+
+    Returns:
+        int: fecha como un numero entero.
+    """
+    d, m, y = date.split('/')
+    return int(y+m+d)
+
+
+def ordenar_por_antiguedad(pedidos, ascendiente: bool = True) -> list[dict]:
+    """Devuelve los pedidos ordenados en orden ascendiente segun la fecha en la que se entrego.
+
+    Args:
+        ascendiente (bool, optional): Define si el diccionario se devuelve ascendiendo o descendiendo. Defaults to True.
+
+    Returns:
+        list[dict]: Los pedidos ordenados segun su fecha
+    """
+    return sorted(pedidos, key=lambda x: (date_conversor(x['Fecha']), x['Nro. Pedido']), reverse=not ascendiente)
+
+
+def ver_completados() -> None:
+    """Imprime los pedidos completados por orden de antiguedad
+    """
+    pedidos = dp.run()
+    pedidos = ordenar_por_antiguedad(pedidos)
+    for pedido in pedidos:
+        print(",".join(pedido.values()))
 
 
 def generar_menu() -> tuple:
@@ -54,16 +104,32 @@ def main():
     while val:
         opc, salir = generar_menu()
 
+        # salir
         if opc == salir:
             print("Adios!")
             val = False
 
         if opc == 1:
             APP.cargar()
-        if opc == 2:
+
+        elif opc == 2:
             APP.borrar()
-        if opc == 3:
+
+        elif opc == 3:
             APP.modificar()
 
+        elif opc == 4:
+            pass
 
-main()
+        elif opc == 5:
+            dp.run()
+
+        elif opc == 6:
+            ver_completados()
+
+        elif opc == 7:
+            APP.maximo_pedido()
+
+
+if __name__ == "__main__":
+    main()
