@@ -1,9 +1,21 @@
 from abm import MainApp
 from os import path
 import pruebas_geo as pg
+from sys import platform
 
 
-CAMINO_PARA_EL_CSV: str = "src\\pedidos.csv"
+def slash_gen() -> str:
+    """Genera la barra del medio para los path"""
+    if platform == "linux" or platform == "linux2":
+        return "/"
+    elif platform == "darwin":
+        return "/"
+    elif platform == "win32":
+        return "\\"
+
+
+SLASH = slash_gen()
+CAMINO_PARA_EL_CSV: str = f"src{SLASH}pedidos.csv"
 CAPACIDAD_C1: int = 600
 CAPACIDAD_C2: int = 1000
 CAPACIDAD_C3: int = 500

@@ -1,8 +1,8 @@
 # antes era pruebas de geo.py, cambie el nombre para importarlo facil
 # el archivo fue escrito por la estudiante anto ranelli, git lo acredita
 # a marcos calvi por el cambio de nombre en el archivo.
+from sys import platform
 
-import csv
 
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
@@ -10,7 +10,21 @@ from geopy.distance import geodesic
 # from abm import MainApp
 from os import path
 
-ROUTE = path.join(path.dirname(__file__), "src\\pedidos.csv")
+
+def slash_gen() -> str:
+    """Genera la barra del medio para los path"""
+    if platform == "linux" or platform == "linux2":
+        return "/"
+    elif platform == "darwin":
+        return "/"
+    elif platform == "win32":
+        return "\\"
+
+
+# ruta al csv
+SLASH = slash_gen()
+
+ROUTE = path.join(path.dirname(__file__), f"src{SLASH}pedidos.csv")
 
 # myApp = MainApp(ROUTE)
 
