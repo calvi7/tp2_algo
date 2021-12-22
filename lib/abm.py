@@ -159,7 +159,7 @@ class Controlador:
         valores_dict = self.dict_data().copy()
         valores_dict[index][key] = valor
 
-        self.pedidos.lista[index] = ','.join(valores_dict[index].values())
+        list(self.pedidos)[index] = ','.join(valores_dict[index].values())
         self.__actualizar()
 
     def __date_conversor(self, date: str) -> int:
@@ -264,7 +264,7 @@ class User:
         except ValueError:
             print("Ingrese un valor numerico.")
         else:
-            if 1 <= rta <= len(self.ctrl.pedidos.lista)+1:
+            if 1 <= rta <= len(list(self.ctrl.pedidos))+1:
                 self.ctrl.borrar(rta-1)
                 print(f"Se borró el pedido {rta}!")
             else:
@@ -279,7 +279,7 @@ class User:
         except ValueError:
             print('Ingrese un valor numerico.')
         else:
-            if 1 <= rta <= len(self.ctrl.pedidos.lista):
+            if 1 <= rta <= len(list(self.ctrl.pedidos)):
 
                 print("Se pueden modificar los siguientes atributos del pedido:")
                 print(", ".join(x for x in titulos))
