@@ -69,14 +69,6 @@ class Pedidos:
         return codigo in ["1334", "568"] if self.__validar_numerico(codigo) else False
 
 
-class Titulos(str):
-    """Los titulos del csv. Verifica que tenga el largo adecuado.
-    """
-
-    def __init__(self, entrada: str) -> None:
-        self.titulos: str = entrada.replace(', ', ',')
-
-
 class Controlador:
     """El encargado principal del ABM
     """
@@ -87,13 +79,10 @@ class Controlador:
         with open(self.route, 'r') as f:
             self.raw_pedidos: list[str] = f.read().splitlines()
 
-        tmp_titulos = Titulos(self.raw_pedidos[0])
+        self.titulos = self.raw_pedidos[0]
         tmp_pedidos = Pedidos(self.raw_pedidos[1:])
 
-        self.titulos = tmp_titulos.titulos
         self.pedidos = tmp_pedidos.lista
-
-        self.__actualizar()
 
     def ver_pedidos(self) -> None:
         print(self.titulos)
@@ -123,6 +112,9 @@ class Controlador:
 
         # fix curita que puede traer otros problemas
         self.pedidos = list(set(self.pedidos))
+
+        self.pedidos = list(
+            sorted(self.pedidos, key=lambda x: (int(x.split(",")[0]), x.split(",")[6])))
 
         with open(self.route, 'w') as f:
             f.writelines(self.titulos + '\n')
@@ -159,7 +151,7 @@ class Controlador:
         valores_dict = self.dict_data().copy()
         valores_dict[index][key] = valor
 
-        list(self.pedidos)[index] = ','.join(valores_dict[index].values())
+        self.pedidos[index] = ','.join(valores_dict[index].values())
         self.__actualizar()
 
     def __date_conversor(self, date: str) -> int:
@@ -264,7 +256,7 @@ class User:
         except ValueError:
             print("Ingrese un valor numerico.")
         else:
-            if 1 <= rta <= len(list(self.ctrl.pedidos))+1:
+            if 1 <= rta <= len(self.ctrl.pedidos)+1:
                 self.ctrl.borrar(rta-1)
                 print(f"Se borró el pedido {rta}!")
             else:
@@ -279,7 +271,7 @@ class User:
         except ValueError:
             print('Ingrese un valor numerico.')
         else:
-            if 1 <= rta <= len(list(self.ctrl.pedidos)):
+            if 1 <= rta <= len(self.ctrl.pedidos):
 
                 print("Se pueden modificar los siguientes atributos del pedido:")
                 print(", ".join(x for x in titulos))
