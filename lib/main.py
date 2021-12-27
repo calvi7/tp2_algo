@@ -5,6 +5,8 @@ import distribucion_pesos as dp
 
 from abm import MainApp
 
+from el_contador import counter
+
 # Para que distintos sistemas operativos puedan operar
 # sin cambiar el archivo
 
@@ -23,9 +25,6 @@ def slash_gen() -> str:
 SLASH = slash_gen()
 CSV_ROUTE = f'src{SLASH}pedidos.csv'
 ROUTE = path.join(path.dirname(__file__), CSV_ROUTE)
-
-# inicializo la MainApp
-APP = MainApp(ROUTE)
 
 
 def date_conversor(date: str) -> int:
@@ -73,7 +72,7 @@ def generar_menu() -> tuple:
         1: "cargar pedido",
         2: "borrar pedido",
         3: "modificar pedido",
-        4: "comprobar validez del lote",
+        4: "comprobar validez del lote y escribir archivos de vasos y botellas",
         5: "procesar los pedidos y generar archivo de salida",
         6: "ver los pedidos realizados ordenados segun su antiguedad",
         7: "ver articulo mas pedido",
@@ -99,7 +98,13 @@ def generar_menu() -> tuple:
 def main():
     # inicializo variable para el loop
     val = True
+    
+    # Inicializo la app
+    APP = MainApp(ROUTE)
 
+    # Inicializo el matcher
+    matcher = counter.Matcher()
+    
     # loop
     while val:
         opc, salir = generar_menu()
@@ -119,7 +124,8 @@ def main():
             APP.modificar()
 
         elif opc == 4:
-            pass
+            matcher.contador()
+            print("Listo!")
 
         elif opc == 5:
             dp.run()
